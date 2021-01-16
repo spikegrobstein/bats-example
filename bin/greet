@@ -1,0 +1,55 @@
+#! /usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+LIB="$SCRIPTPATH/../lib"
+
+. "$LIB/print.bash"
+
+# make sure this script is not being run as root
+# this is a contrived example so we can stub out the 'id' command
+uid="$( id -u )"
+if (( uid == 0 )); then
+  error "Do not run this script as root."
+  exit 2
+fi
+
+# if this gets set to non-zero (via -f flag), be more friendly
+extra_friendly=0
+
+# parse options
+while getopts ':f' opt; do
+  case "$opt" in
+    f)
+      extra_friendly=1
+      ;;
+    \?)
+      error "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+    :)
+      error "Invalid option: -$OPTARG requires an argument"
+      exit 1
+      ;;
+  esac
+done
+
+# shift everything over so we can read the next arguments
+shift "$(( OPTIND - 1 ))"
+
+# set name to the next argument or 'Anonymous' if it's blank
+# we're using the if statement so we can spit out a warning
+if [[ -z "${1:-}" ]]; then
+  warn "No name specified."
+  name="Anonymous"
+else
+  name="$1"
+fi
+
+if (( extra_friendly )); then
+  echo "Hey there, $name. How are you doing today?"
+else
+  echo "Hi, $name."
+fi
+

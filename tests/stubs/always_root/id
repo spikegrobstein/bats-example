@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+# this is a stub for the 'id' command that will always output '0' and ignores any arguments
+
+echo "0"
+
